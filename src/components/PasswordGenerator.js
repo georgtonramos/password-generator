@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Button, FormControlLabel, Checkbox, TextField, Box, FormHelperText } from '@mui/material';
+import { Button, FormControlLabel, Checkbox, TextField, Box, FormHelperText, Grid } from '@mui/material';
 
 const PasswordGenerator = () => {
-  const [passwordLength, setPasswordLength] = useState(8);
+  const [passwordLength, setPasswordLength] = useState(12);
   const [includeNumbers, setIncludeNumbers] = useState(false);
   const [includeSpecialCharacters, setIncludeSpecialCharacters] = useState(false);
   const [includeUppercaseLetters, setIncludeUppercaseLetters] = useState(false);
   const [numbersOnly, setNumbersOnly] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState("");
   const [error, setError] = useState("");
+  const [passwordIsCopied, setPasswordIsCopied] = useState(false);
 
   const handleGeneratePassword = () => {
     // Validação de entrada
@@ -43,16 +44,36 @@ const PasswordGenerator = () => {
     setGeneratedPassword(password);
   };
 
+  const handleCopyPassword = () => {
+    navigator.clipboard.writeText(generatedPassword)
+      .then(() => {
+        setPasswordIsCopied(true);
+        setTimeout(() => setPasswordIsCopied(false), 2000);
+      })
+      .catch(err => {
+        console.error('Não foi possível copiar a senha', err);
+      });
+  };
+
   return (
+    <>
+    <Grid
+    container
+    direction="column"
+    justifyContent="center"
+    alignItems="center"
+    spacing={2}
+    >
+    <Grid item xs={12} sm={8} md={6}>
+
     <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
-        width: '100%', // Faz o box ocupar toda a largura disponível
-        maxWidth: 300, // Limita a largura máxima a 300px
+        width: '120%',
+        maxWidth: 300,
         margin: 'auto',
-        mt: 5,
         p: 2,
         border: '1px solid #ddd',
         borderRadius: 2
@@ -96,19 +117,28 @@ const PasswordGenerator = () => {
       
         label="Somente números"
       />
-
+      
+      {/* ... */}
       <Button variant="contained" onClick={handleGeneratePassword}>Gerar senha</Button>
-
       <FormHelperText error>{error}</FormHelperText>
-
-      <TextField
-        label="Senha gerada"
-        value={generatedPassword}
-        InputProps={{
-          readOnly: true,
-        }}
-      />
+      {generatedPassword && (
+        <>
+          <TextField
+            type="text"
+            label="Senha gerada"
+            value={generatedPassword}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+          <Button variant="contained" onClick={handleCopyPassword}>Copiar Senha</Button>
+          {passwordIsCopied && <p>Senha copiada para a área de transferência!</p>}
+        </>
+      )}
     </Box>
+  </Grid>
+</Grid>
+</>
   );
 };
 
